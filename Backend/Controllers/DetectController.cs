@@ -9,16 +9,24 @@ namespace backend.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public DetectController(IHttpClientFactory httpClientFactory)
+        private readonly ILogger<DetectController> _logger;
+
+        public DetectController(IHttpClientFactory httpClientFactory, ILogger<DetectController> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> Detect([FromForm] IFormFile file, [FromForm] string detectionType)
         {
             if (file == null || file.Length == 0)
+            {
+                _logger.LogWarning("Detect request received with no file.");
                 return BadRequest("No file uploaded.");
+            }
+
+            _logger.LogInformation("Received file: {FileName} for detection: {Type}", file.FileName, detectionType);
 
             var httpClient = _httpClientFactory.CreateClient();
 
@@ -28,14 +36,28 @@ namespace backend.Controllers
             content.Add(streamContent, "file", file.FileName);
             content.Add(new StringContent(detectionType), "detectionType");
 
-            // 🔁 Adjust this if you're not running FastAPI locally
-            var response = await httpClient.PostAsync("http://localhost:5000/detect", content);
+            _logger.LogInformation("Forwarding image to Python service...");
 
-            if (!response.IsSuccessStatusCode)
-                return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+            try
+            {
+                var response = await httpClient.PostAsync("http://localhost:5000/detect", content);
 
-            var resultJson = await response.Content.ReadAsStringAsync();
-            return Content(resultJson, "application/json");
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Python service returned error: {StatusCode}", response.StatusCode);
+                    return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+                }
+
+                var resultJson = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("Python service returned: {Result}", resultJson);
+
+                return Content(resultJson, "application/json");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while calling the Python ML service.");
+                return StatusCode(500, "Internal server error");
+            }
         }
     }
 }
