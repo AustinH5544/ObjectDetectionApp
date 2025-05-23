@@ -5,7 +5,7 @@ import uuid
 
 model = YOLO("yolov8n.pt")
 
-# Mapping of detected classes to custom categories (e.g., 'car', 'animal')
+# Mapping of detected classes to custom categories (like car/animal/persom)
 CATEGORY_MAP = {
     'person': 'person',
     'car': 'car',
@@ -61,7 +61,7 @@ def run_detection(image_path, detection_type):
     os.makedirs("outputs", exist_ok=True)
     output_filename = f"outputs/annotated_{uuid.uuid4().hex}.jpg"
     image.save(output_filename)
-    
+
     return {
         "detected": list(found),
         "details": raw_detections,
