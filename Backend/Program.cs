@@ -14,4 +14,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+builder.Services.AddHttpClient();
+
 app.Run();
