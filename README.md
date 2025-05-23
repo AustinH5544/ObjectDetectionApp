@@ -1,14 +1,15 @@
 # ObjectDetectionApp
 Application to do multiple different forms of object tracking
 
-Go into the object detection folder where you have your frontend/backend/ml-services folders.
+Note to Brady:
 
-In terminal, run:
-chmod +x start-all.sh
-chmod +x stop-all.sh
+From PowerShell, go into the object detection folder where you have your frontend/backend/ml-services folders.
 
-Run all the services:
-./start-all.sh
+Run this command to start all services:
+.\start-all.ps1
 
-Stop all the services:
-./stop-all.sh
+Run this command to stop all services:
+.\stop-all.ps1
+
+
+
