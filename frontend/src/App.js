@@ -7,6 +7,7 @@ function App() {
   const [confidence, setConfidence] = useState('0.25'); // default confidence as string
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState('yolo11x.pt'); // default model
 
   // COCO dataset class names
   const cocoClasses = [
@@ -30,7 +31,7 @@ function App() {
     formData.append('file', file);
     formData.append('detectionType', detectionType);
     formData.append('minConfidence', confidence);  // send confidence
-
+    formData.append('model',model)
     setLoading(true);
     try {
       const response = await axios.post('http://localhost:5157/api/detect', formData, {
@@ -58,10 +59,30 @@ function App() {
             {cocoClasses.map((className, index) => (
               <option key={index} value={className}>{className}</option>
             ))}
-            {/* Add more options as needed */}
           </select>
         </label>
+
         <br /><br />
+      
+        <label>
+        Model:
+          <select value={model} onChange={e => setModel(e.target.value)}>
+            <option value="yolo11s.pt">YOLOv11s</option>
+            <option value="yolo11n.pt">YOLOv11n</option>
+            <option value="yolo11m.pt">YOLOv11m</option>
+            <option value="yolo11l.pt">YOLOv11L</option>
+            <option value="yolo11x.pt">YOLOv11x</option>
+            <option value="yolov8s.pt">YOLOv8s</option>
+            <option value="yolov8n.pt">YOLOv8n</option>
+            <option value="yolov8m.pt">YOLOv8m</option>
+            <option value="yolov8l.pt">YOLOv8L</option>
+            <option value="yolov8x.pt">YOLOv8x</option>
+            
+          </select>
+        </label>
+      
+      <br/><br/>
+      
         <label>
           Min Confidence (0 to 1):
           <input

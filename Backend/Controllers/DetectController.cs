@@ -20,7 +20,8 @@ namespace backend.Controllers
         public async Task<IActionResult> Detect(
             [FromForm] IFormFile file,
             [FromForm] string detectionType,
-            [FromForm] float minConfidence = 0.25f)
+            [FromForm] float minConfidence = 0.25f,
+            [FromForm] string model = "yolo11x.pt")
         {
             if (file == null || file.Length == 0)
             {
@@ -41,6 +42,7 @@ namespace backend.Controllers
             content.Add(streamContent, "file", file.FileName);
             content.Add(new StringContent(detectionType), "detectionType");
             content.Add(new StringContent(minConfidence.ToString(System.Globalization.CultureInfo.InvariantCulture)), "minConfidence");
+            content.Add(new StringContent(model), "model");
 
             _logger.LogInformation("Forwarding image to Python service...");
 

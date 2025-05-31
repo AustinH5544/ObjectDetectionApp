@@ -3,9 +3,9 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import uuid
 
-model = YOLO("yolo11x.pt")
 
-def run_detection(image_path, detection_type="all", min_confidence=0.25):
+def run_detection(image_path, detection_type="all", min_confidence=0.25, model_name="yolo11x.pt"):
+    model = YOLO(model_name)
     print("Min Confidence = "+str(min_confidence))
     results = model(image_path)[0]
     found = set()

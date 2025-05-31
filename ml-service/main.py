@@ -23,14 +23,15 @@ app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 async def detect_object(
     file: UploadFile,
     detectionType: str = Form(...),
-    minConfidence: float = Form(0.25)  # <-- Add this line with default value
+    minConfidence: float = Form(0.25),
+    model: str = Form("yolo11x.pt")
 ):
     temp_filename = f"temp_{uuid.uuid4()}.jpg"
     with open(temp_filename, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     # Pass minConfidence to your detection function
-    result = run_detection(temp_filename, detectionType, minConfidence)
+    result = run_detection(temp_filename, detectionType, minConfidence,model)
 
     os.remove(temp_filename)
 
