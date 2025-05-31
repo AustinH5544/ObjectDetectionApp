@@ -25,7 +25,7 @@ ml-service/.pytest_cache/
 ml-service/env/
 ml-service/venv/
 ml-service/.env
-
+ml-service/outputs
 # === OS Generated ===
 *.~*
 *.bak
