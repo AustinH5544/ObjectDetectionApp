@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import uuid
 
-model = YOLO("yolov8n.pt")
+model = YOLO("yolo11x.pt")
 
 def run_detection(image_path, detection_type="all", min_confidence=0.25):
     print("Min Confidence = "+str(min_confidence))
