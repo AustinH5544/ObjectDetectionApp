@@ -5,59 +5,45 @@ import uuid
 
 model = YOLO("yolov8n.pt")
 
-# Mapping of detected classes to custom categories (like car/animal/persom)
-CATEGORY_MAP = {
-    'person': 'person',
-    'car': 'car',
-    'truck': 'car',
-    'bus': 'car',
-    'motorcycle': 'car',
-    'dog': 'animal',
-    'cat': 'animal',
-    'horse': 'animal',
-    'sheep': 'animal',
-    'cow': 'animal'
-}
-
-def run_detection(image_path, detection_type):
+def run_detection(image_path, detection_type="all", min_confidence=0.25):
+    print("Min Confidence = "+str(min_confidence))
     results = model(image_path)[0]
     found = set()
     raw_detections = []
 
-    # Open the image for drawing
     image = Image.open(image_path).convert("RGB")
     draw = ImageDraw.Draw(image)
 
-    # Load a font
     try:
         font = ImageFont.truetype("arial.ttf", 16)
     except:
-        font = ImageFont.load_default()  # fallback so it *always* works
+        font = ImageFont.load_default()
 
-    # Draw bounding boxes and labels
     for box in results.boxes:
         class_id = int(box.cls[0])
-        label = results.names[class_id]
+        label = model.names[class_id]
         confidence = float(box.conf[0])
-        mapped = CATEGORY_MAP.get(label)
 
-        if mapped:
-            found.add(mapped)
-            raw_detections.append({
-                "original_label": label,
-                "mapped_label": mapped,
-                "confidence": confidence
-            })
+        # Filter by confidence threshold
+        if confidence < min_confidence:
+            continue
 
-            xy = box.xyxy[0].tolist()
-            draw.rectangle(xy, outline="red", width=2)
+        # If filtering by label
+        if detection_type != "all" and detection_type != label:
+            continue
 
-            # Ensure labels are visible
-            text = f"{label} {confidence:.2f}"
-            text_position = (xy[0], max(0, xy[1] - 20))  # prevent text from going off top
-            draw.text(text_position, text, fill="yellow", font=font)
+        found.add(label)
+        raw_detections.append({
+            "label": label,
+            "confidence": confidence
+        })
 
-    # Save the annotated image
+        xy = box.xyxy[0].tolist()
+        draw.rectangle(xy, outline="red", width=2)
+        text = f"{label} {confidence:.2f}"
+        text_position = (xy[0], max(0, xy[1] - 20))
+        draw.text(text_position, text, fill="yellow", font=font)
+
     os.makedirs("outputs", exist_ok=True)
     output_filename = f"outputs/annotated_{uuid.uuid4().hex}.jpg"
     image.save(output_filename)
