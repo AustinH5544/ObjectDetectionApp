@@ -2,13 +2,13 @@ from ultralytics import YOLO
 from PIL import Image, ImageDraw, ImageFont
 import os
 import uuid
-
+from collections import defaultdict
 
 def run_detection(image_path, detection_type="all", min_confidence=0.25, model_name="yolo11x.pt"):
     model = YOLO(model_name)
     print("Min Confidence = "+str(min_confidence))
     results = model(image_path)[0]
-    found = set()
+    found_counts = defaultdict(int)  
     raw_detections = []
 
     image = Image.open(image_path).convert("RGB")
@@ -32,7 +32,7 @@ def run_detection(image_path, detection_type="all", min_confidence=0.25, model_n
         if detection_type != "all" and detection_type != label:
             continue
 
-        found.add(label)
+        found_counts[label] += 1
         raw_detections.append({
             "label": label,
             "confidence": confidence
@@ -48,8 +48,11 @@ def run_detection(image_path, detection_type="all", min_confidence=0.25, model_n
     output_filename = f"outputs/annotated_{uuid.uuid4().hex}.jpg"
     image.save(output_filename)
 
+    # Convert found_counts dict to list of {label, count}
+    found_list = [{"label": label, "count": count} for label, count in found_counts.items()]
+
     return {
-        "detected": list(found),
+        "detected": found_list,   
         "details": raw_detections,
         "annotated_image": output_filename
     }
