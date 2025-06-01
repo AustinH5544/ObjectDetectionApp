@@ -22,6 +22,41 @@ function App() {
     'truck', 'tv', 'umbrella', 'vase', 'wine glass', 'zebra'
   ];
 
+const object365Classes = [
+  "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", 
+  "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", 
+  "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack", 
+  "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball", 
+  "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket", 
+  "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple", 
+  "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", 
+  "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", 
+  "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator", 
+  "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush", "banner", 
+  "balloon", "baseball", "bench", "birthday cake", "board", "bookcase", "bottle opener", 
+  "bow tie", "bracelet", "bucket", "building", "bus stop", "cabinet", "calculator", "candle", 
+  "carpet", "cart", "cell phone charger", "cereal box", "chair mat", "clothes", "clutch", 
+  "coffee maker", "comb", "computer monitor", "couch cushion", "credit card", "crown", "cucumber", 
+  "cupboard", "curtain", "desk lamp", "desktop computer", "diaper", "dishwasher", "dish towel", 
+  "door", "door handle", "earphones", "egg", "egg carton", "face mask", "faucet", "file cabinet", 
+  "fire extinguisher", "flag", "flower pot", "food processor", "forklift", "frame", "freezer", 
+  "frying pan", "game console", "garbage bin", "gas stove", "glasses", "glue", "guitar", "hair brush", 
+  "hair clip", "hand sanitizer", "headphones", "heater", "helmet", "hole puncher", "hot tub", 
+  "ice cream", "ice tray", "inhaler", "iron", "jar", "jeans", "key", "keyboard", "knife block", 
+  "ladder", "lamp", "laptop stand", "laundry basket", "leaf blower", "lighter", "magnet", "mailbox", 
+  "makeup brush", "mango", "microphone", "microwave oven", "milk", "minivan", "mirror", "mouse pad", 
+  "mug", "nail polish", "necklace", "notebook", "oven mitt", "package", "paintbrush", "paper towel", 
+  "parking meter", "pen", "pencil", "pepper", "piano", "picture frame", "pillow", "pizza cutter", 
+  "plate", "playing card", "plunger", "post-it note", "printer", "projector", "radio", "recycling bin", 
+  "remote control", "ring", "rubber band", "rug", "salt shaker", "sandal", "scarf", "screwdriver", 
+  "shampoo", "sharpener", "shaving cream", "shoe", "shovel", "sink faucet", "skate", "sled", "smoke detector", 
+  "soap", "socks", "spatula", "speaker", "spoon rest", "spray bottle", "squeegee", "stapler", "steering wheel", 
+  "stool", "stove", "suitcase handle", "sunglasses", "surfboard leash", "swimming pool", "syringe", "table lamp", 
+  "table tennis racket", "tape dispenser", "teddy bear toy", "television remote", "tent", "thermometer", "toaster oven", 
+  "toilet paper", "toothpaste", "towel", "toy car", "toy robot", "traffic cone", "train track", "trash can", "treadmill", 
+  "umbrella stand", "vacuum cleaner", "vase flower", "video game controller", "washing machine", "watch", "water bottle", 
+  "watermelon", "wheelchair", "window", "wine bottle", "wrench", "yoga mat"
+];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,17 +87,6 @@ function App() {
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} required />
         <br /><br />
-        <label>
-          Detection Type:
-          <select value={detectionType} onChange={e => setDetectionType(e.target.value)}>
-            <option value="all">All</option>
-            {cocoClasses.map((className, index) => (
-              <option key={index} value={className}>{className}</option>
-            ))}
-          </select>
-        </label>
-
-        <br /><br />
       
         <label>
         Model:
@@ -77,11 +101,24 @@ function App() {
             <option value="yolov8m.pt">YOLOv8m</option>
             <option value="yolov8l.pt">YOLOv8L</option>
             <option value="yolov8x.pt">YOLOv8x</option>
+            <option value ="yolo11n_object365.pt">Object365</option>
             
           </select>
         </label>
       
       <br/><br/>
+        <label>
+          Detection Type:
+          <select value={detectionType} onChange={e => setDetectionType(e.target.value)}>
+            <option value="all">All</option>
+           {(model === 'yolo11n_object365.pt' ? object365Classes : cocoClasses).map((className, index) => (
+            <option key={index} value={className}>{className}</option>
+    ))}
+          </select>
+        </label>
+
+        <br /><br />
+      
       
         <label>
           Min Confidence (0 to 1):
