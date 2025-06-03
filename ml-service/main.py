@@ -16,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static files from the outputs directory (for annotated images)
+# Serve static files from the outputs directory (for annotated images and videos)
 app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
 @app.post("/detect")
@@ -26,17 +26,24 @@ async def detect_object(
     minConfidence: float = Form(0.25),
     model: str = Form("yolo11x.pt")
 ):
-    temp_filename = f"temp_{uuid.uuid4()}.jpg"
+    # Get file extension
+    file_extension = os.path.splitext(file.filename)[-1].lower()
+    temp_filename = f"temp_{uuid.uuid4()}{file_extension}"
+
+    # Save uploaded file temporarily
     with open(temp_filename, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Pass minConfidence to your detection function
-    result = run_detection(temp_filename, detectionType, minConfidence,model)
+    # Run detection (returns result dict)
+    result = run_detection(temp_filename, detectionType, minConfidence, model)
 
+    # Remove temp file
     os.remove(temp_filename)
 
-    if "annotated_image" in result:
-        annotated_filename = os.path.basename(result["annotated_image"])
-        result["annotated_image_url"] = f"http://localhost:5000/outputs/{annotated_filename}"
+    # Return appropriate URL based on file type
+    if "annotated_image_url" in result:
+        result["annotated_image_url"] = f"http://localhost:5000/outputs/{os.path.basename(result['annotated_image_url'])}"
+    elif "annotated_video_url" in result:
+        result["annotated_video_url"] = f"http://localhost:5000/outputs/{os.path.basename(result['annotated_video_url'])}"
 
     return result
